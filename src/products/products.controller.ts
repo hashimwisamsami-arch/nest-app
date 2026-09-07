@@ -3,6 +3,7 @@ import { Controller, Get } from '@nestjs/common';
 @Controller()
 export class ProductsController {
   // GET: ~/api/products
+  // GET
   @Get('/api/products')
   public getAllProducts() {
     return [
