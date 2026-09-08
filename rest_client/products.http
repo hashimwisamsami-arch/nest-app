@@ -1,0 +1,26 @@
+###Get All Products
+GET http://localhost:5000/api/products
+
+###Get Product By id
+GET http://localhost:5000/api/products/3
+
+###Craete Products
+POST http://localhost:5000/api/products
+Content-Type: application/json
+
+{
+    "title":"product one",
+    "price":10
+}
+
+###Update Product By id
+PUT http://localhost:5000/api/products/3
+Content-Type: application/json
+
+{
+    "title":"product one",
+    "price":10
+}
+
+###Delete Product By id
+DELETE http://localhost:5000/api/products/3
