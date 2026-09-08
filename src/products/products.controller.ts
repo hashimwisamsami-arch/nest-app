@@ -1,39 +1,31 @@
+import { ProductsService } from './products.service.js';
 import {
   Controller,
   Get,
   Post,
   Body,
   Param,
-  NotFoundException,
   Put,
   Delete,
   ParseIntPipe,
 } from '@nestjs/common';
 import { CreateProductDto } from './dtos/create-product.dto.js';
 import { UpdateProductDto } from './dtos/update-product.dto.js';
-type ProductType = { id: number; title: string; price: number };
 
 @Controller('api/products')
 export class ProductsController {
-  private products: ProductType[] = [
-    { id: 1, title: 'book', price: 10 },
-    { id: 2, title: 'pen', price: 2 },
-    { id: 3, title: 'bag', price: 25 },
-  ];
+  private productsService: ProductsService = new ProductsService();
+
   // GET: ~/api/products
   @Get()
   public getAllProducts() {
-    return this.products;
+    return this.productsService.getAll();
   }
 
   // GET: ~/api/products/:id
   @Get(':id')
   public getProductById(@Param('id', ParseIntPipe) id: number) {
-    const product = this.products.find((p) => p.id === id);
-    if (!product) {
-      throw new NotFoundException('product not found');
-    }
-    return product;
+    return this.productsService.getOneBy(id);
   }
 
   // Post: ~/api/products
@@ -42,13 +34,7 @@ export class ProductsController {
     @Body()
     body: CreateProductDto,
   ) {
-    const newProduct: ProductType = {
-      id: this.products.length + 1,
-      title: body.title,
-      price: body.price,
-    };
-    this.products.push(newProduct);
-    return newProduct;
+    return this.productsService.craeteProduct(body);
   }
   // Put: ~/api/products/:id
   @Put(':id')
@@ -57,19 +43,11 @@ export class ProductsController {
     @Body()
     body: UpdateProductDto,
   ) {
-    const product = this.products.find((p) => p.id === id);
-    if (!product) {
-      throw new NotFoundException('product not found');
-    }
-    return { message: 'Product Updated successfully with id:' + id };
+    return this.productsService.update(id, body);
   }
 
   @Delete(':id')
   public deleteProduct(@Param('id', ParseIntPipe) id: number) {
-    const product = this.products.find((p) => p.id === id);
-    if (!product) {
-      throw new NotFoundException('product not found');
-    }
-    return { message: 'Product Deleted successfully with id:' + id };
+    return this.productsService.delete(id);
   }
 }
