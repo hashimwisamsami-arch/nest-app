@@ -57,7 +57,6 @@ export class ProductsController {
     if (!product) {
       throw new NotFoundException('product not found');
     }
-    console.log(body);
     return { message: 'Product Updated successfully with id:' + id };
   }
 
