@@ -38,7 +38,10 @@ export class ProductsController {
 
   // Post: ~/api/products
   @Post()
-  public craeteNewProduct(@Body() body: CreateProductDto) {
+  public craeteNewProduct(
+    @Body()
+    body: CreateProductDto,
+  ) {
     const newProduct: ProductType = {
       id: this.products.length + 1,
       title: body.title,
@@ -51,7 +54,8 @@ export class ProductsController {
   @Put(':id')
   public updateProduct(
     @Param('id', ParseIntPipe) id: number,
-    @Body() body: UpdateProductDto,
+    @Body()
+    body: UpdateProductDto,
   ) {
     const product = this.products.find((p) => p.id === id);
     if (!product) {
