@@ -14,7 +14,7 @@ import { UpdateProductDto } from './dtos/update-product.dto.js';
 
 @Controller('api/products')
 export class ProductsController {
-  private productsService: ProductsService = new ProductsService();
+  constructor(private readonly productsService: ProductsService) {}
 
   // GET: ~/api/products
   @Get()
