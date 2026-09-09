@@ -3,25 +3,31 @@ import { ProductsModule } from './products/products.module.js';
 import { ReviewsModule } from './reviews/reviews.module.js';
 import { UsersModule } from './users/users.module.js';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Product } from './products/product.entity.js';
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      envFilePath: `.env.${process.env.NODE_ENV}`,
     }),
     ProductsModule,
     ReviewsModule,
     UsersModule,
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      database: process.env.DB_NAME,
-      username: process.env.DB_USERNAME,
-      password: process.env.DB_PASSWORD,
-      port: Number(process.env.DB_PORT),
-      host: process.env.DB_HOST,
-      synchronize: true, //only in Development
-      entities: [Product],
+    TypeOrmModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => {
+        return {
+          type: 'postgres',
+          database: config.get<string>('DB_NAME'),
+          username: config.get<string>('DB_USERNAME'),
+          password: config.get<string>('DB_PASSWORD'),
+          port: config.get<number>('DB_PORT'),
+          host: config.get<string>('DB_HOST'),
+          synchronize: process.env.NODE_ENV !== 'production', //only in Development
+          entities: [Product],
+        };
+      },
     }),
   ],
 })
