@@ -1,14 +1,16 @@
 import { Controller, Get } from '@nestjs/common';
+import { ReviewService } from './reviews.service.js';
+import { UsersService } from '../users/users.service.js';
 
 @Controller()
 export class ReviewsControllers {
+  constructor(
+    private readonly reviewsService: ReviewService,
+    private readonly usersService: UsersService,
+  ) {}
   // GET: ~/api/reviews
   @Get('/api/reviews')
   public getAllReviews() {
-    return [
-      { id: 1, rating: 4, comment: 'good' },
-      { id: 2, rating: 1, comment: 'bad' },
-      { id: 3, rating: 5, comment: 'very good' },
-    ];
+    return this.reviewsService.getAll();
   }
 }
