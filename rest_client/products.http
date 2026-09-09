@@ -10,6 +10,7 @@ Content-Type: application/json
 
 {
     "title":"product one",
+    "description":"good one",
     "price":10
 }
 
@@ -19,6 +20,7 @@ Content-Type: application/json
 
 {
     "title":"product one",
+    "description":"good one",
     "price":10
 }
 
