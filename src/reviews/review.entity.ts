@@ -3,28 +3,24 @@ import {
   CreateDateColumn,
   Entity,
   ManyToOne,
-  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import type { Relation } from 'typeorm';
 import { CURRENT_TIMESTAMP } from '../utils/constants.js';
-import { Review } from '../reviews/review.entity.js';
+import { Product } from '../products/product.entity.js';
 import { User } from '../users/users.entity.js';
 
-@Entity({ name: 'products' })
-export class Product {
+@Entity({ name: 'reviews' })
+export class Review {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({ type: 'int' })
+  rating: number;
+
   @Column()
-  title: string;
-
-  @Column({ type: 'varchar', length: '150' })
-  description: string;
-
-  @Column({ type: 'float' })
-  price: number;
+  comment: string;
 
   @CreateDateColumn({ type: 'timestamp', default: () => CURRENT_TIMESTAMP })
   createdAt: Date;
@@ -36,9 +32,9 @@ export class Product {
   })
   updatedAt: Date;
 
-  @OneToMany(() => Review, (review) => review.product)
-  reviews: Relation<Review>[];
+  @ManyToOne(() => Product, (product) => product.reviews)
+  product: Relation<Product>;
 
-  @ManyToOne(() => User, (user) => user.products)
+  @ManyToOne(() => User, (user) => user.reviews)
   user: Relation<User>;
 }
