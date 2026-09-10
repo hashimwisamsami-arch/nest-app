@@ -5,6 +5,8 @@ import { UsersModule } from './users/users.module.js';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Product } from './products/product.entity.js';
+import { Review } from './reviews/review.entity.js';
+import { User } from './users/users.entity.js';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -25,7 +27,7 @@ import { Product } from './products/product.entity.js';
           port: config.get<number>('DB_PORT'),
           host: config.get<string>('DB_HOST'),
           synchronize: process.env.NODE_ENV !== 'production', //only in Development
-          entities: [Product],
+          entities: [Product, Review, User],
         };
       },
     }),
