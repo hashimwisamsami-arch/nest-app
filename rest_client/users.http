@@ -1,2 +1,2 @@
-###Get All users
-GET http://localhost:5000/api/users
+###Get Current user
+GET http://localhost:5000/api/users/current-user
