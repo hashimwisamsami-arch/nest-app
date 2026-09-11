@@ -72,7 +72,7 @@ export class UsersService {
    * @param id id of logged  user
    * @returns the user from DB
    */
-  public async getCurrentUser(id: number) {
+  public async getCurrentUser(id: number): Promise<User> {
     const user = await this.usersRepository.findOne({
       where: { id },
     });
@@ -80,6 +80,14 @@ export class UsersService {
       throw new BadRequestException('user not found');
     }
     return user;
+  }
+
+  /**
+   * Get All Users From DB
+   * @returns collection of users
+   */
+  public getAll(): Promise<User[]> {
+    return this.usersRepository.find();
   }
 
   /**
