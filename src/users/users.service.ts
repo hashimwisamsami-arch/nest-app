@@ -68,6 +68,21 @@ export class UsersService {
   }
 
   /**
+   * Get Current user
+   * @param id id of logged  user
+   * @returns the user from DB
+   */
+  public async getCurrentUser(id: number) {
+    const user = await this.usersRepository.findOne({
+      where: { id },
+    });
+    if (!user) {
+      throw new BadRequestException('user not found');
+    }
+    return user;
+  }
+
+  /**
    * Generate JWT
    * @param payload JWT payload
    * @returns token
