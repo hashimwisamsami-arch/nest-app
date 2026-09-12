@@ -8,9 +8,15 @@ import {
   Put,
   Delete,
   ParseIntPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { CreateProductDto } from './dtos/create-product.dto.js';
 import { UpdateProductDto } from './dtos/update-product.dto.js';
+import { AuthRolesGuard } from '../users/guards/auth-roles.guard.js';
+import { Roles } from '../users/decorators/user-role.decorator.js';
+import { UserType } from '../utils/enum.js';
+import { CurrentUser } from '../users/decorators/current-user.decorator.js';
+import type { JWTPayloadType } from '../utils/types.js';
 
 @Controller('api/products')
 export class ProductsController {
@@ -30,14 +36,19 @@ export class ProductsController {
 
   // Post: ~/api/products
   @Post()
+  @UseGuards(AuthRolesGuard)
+  @Roles(UserType.ADMIN)
   public craeteNewProduct(
     @Body()
     body: CreateProductDto,
+    @CurrentUser() payload: JWTPayloadType,
   ) {
-    return this.productsService.craeteProduct(body);
+    return this.productsService.craeteProduct(body, payload.id);
   }
   // Put: ~/api/products/:id
   @Put(':id')
+  @UseGuards(AuthRolesGuard)
+  @Roles(UserType.ADMIN)
   public updateProduct(
     @Param('id', ParseIntPipe) id: number,
     @Body()
@@ -47,6 +58,8 @@ export class ProductsController {
   }
 
   @Delete(':id')
+  @UseGuards(AuthRolesGuard)
+  @Roles(UserType.ADMIN)
   public deleteProduct(@Param('id', ParseIntPipe) id: number) {
     return this.productsService.delete(id);
   }
