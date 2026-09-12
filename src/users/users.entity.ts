@@ -12,6 +12,7 @@ import { CURRENT_TIMESTAMP } from '../utils/constants.js';
 import { Product } from '../products/product.entity.js';
 import { Review } from '../reviews/review.entity.js';
 import { UserType } from '../utils/enum.js';
+import { Exclude } from 'class-transformer';
 
 @Entity({ name: 'users' })
 export class User {
@@ -25,6 +26,7 @@ export class User {
   email: string;
 
   @Column()
+  @Exclude()
   password: string;
 
   @Column({ type: 'enum', enum: UserType, default: UserType.NORMAL_USER })
