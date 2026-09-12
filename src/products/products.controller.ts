@@ -9,6 +9,7 @@ import {
   Delete,
   ParseIntPipe,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { CreateProductDto } from './dtos/create-product.dto.js';
 import { UpdateProductDto } from './dtos/update-product.dto.js';
@@ -24,8 +25,12 @@ export class ProductsController {
 
   // GET: ~/api/products
   @Get()
-  public getAllProducts() {
-    return this.productsService.getAll();
+  public getAllProducts(
+    @Query('title') title: string,
+    @Query('minPrice') minPrice: string,
+    @Query('maxPrice') maxPrice: string,
+  ) {
+    return this.productsService.getAll(title, minPrice, maxPrice);
   }
 
   // GET: ~/api/products/:id
