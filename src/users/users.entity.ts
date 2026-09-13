@@ -45,6 +45,9 @@ export class User {
   })
   updatedAt: Date;
 
+  @Column({ type: 'varchar', nullable: true })
+  profileImage: string | null;
+
   @OneToMany(() => Product, (product) => product.user)
   products: Relation<Product>[];
 

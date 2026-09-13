@@ -12,6 +12,8 @@ import { AccessTokenType, JWTPayloadType } from '../utils/types.js';
 import { UpdateUserDto } from './dtos/update-user.dto.js';
 import { UserType } from '../utils/enum.js';
 import { AuthProvider } from './auth.provider.js';
+import { join } from 'path';
+import { unlinkSync } from 'fs';
 
 @Injectable()
 export class UsersService {
@@ -95,5 +97,43 @@ export class UsersService {
       return { message: 'user deleted successfully' };
     }
     throw new ForbiddenException('access denied, you are not allowed');
+  }
+
+  /**
+   *Set Profile image
+   * @param userId id of user
+   * @param newProfileImage profie image
+   * @returns the user from DB
+   */
+  public async setProfileImage(userId: number, newProfileImage: string) {
+    const user = await this.getCurrentUser(userId);
+
+    if (user.profileImage === null) {
+      user.profileImage = newProfileImage;
+    } else {
+      await this.removeProfileImage(userId);
+      user.profileImage = newProfileImage;
+    }
+
+    return this.usersRepository.save(user);
+  }
+
+  /**
+   * Remove Profile Image
+   * @param userId id of user
+   * @returns the user from DB
+   */
+  public async removeProfileImage(userId: number) {
+    const user = await this.getCurrentUser(userId);
+    if (user.profileImage === null) {
+      throw new BadRequestException('there is no image to delete');
+    }
+    const imagePath = join(
+      process.cwd(),
+      `./images/users/${user.profileImage}`,
+    );
+    unlinkSync(imagePath);
+    user.profileImage = null;
+    return this.usersRepository.save(user);
   }
 }
