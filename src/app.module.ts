@@ -8,6 +8,7 @@ import { Product } from './products/product.entity.js';
 import { Review } from './reviews/review.entity.js';
 import { User } from './users/users.entity.js';
 import { APP_INTERCEPTOR } from '@nestjs/core';
+import { UploadsModule } from './uploads/uploads.module.js';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -16,6 +17,7 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
     }),
     ProductsModule,
     ReviewsModule,
+    UploadsModule,
     UsersModule,
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
