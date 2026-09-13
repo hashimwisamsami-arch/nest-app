@@ -51,10 +51,16 @@ export class ReviewService {
   }
   /**
    * Get All Reviews
+   * @param pageNumber number of the current page
+   * @param reviewPerPage number of reviews in page
    * @returns collection of reviews from DB
    */
-  public async getAll() {
-    return await this.reviewsRepository.find({ order: { createdAt: 'DESC' } });
+  public async getAll(pageNumber: number, reviewPerPage: number) {
+    return await this.reviewsRepository.find({
+      order: { createdAt: 'DESC' },
+      skip: reviewPerPage * (pageNumber - 1),
+      take: reviewPerPage,
+    });
   }
 
   /**
