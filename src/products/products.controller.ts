@@ -50,7 +50,7 @@ export class ProductsController {
   ) {
     return this.productsService.craeteProduct(body, payload.id);
   }
-  // Put: ~/api/products/:id
+  // PUt: ~/api/products/:id
   @Put(':id')
   @UseGuards(AuthRolesGuard)
   @Roles(UserType.ADMIN)
@@ -61,7 +61,7 @@ export class ProductsController {
   ) {
     return this.productsService.update(id, body);
   }
-
+  // DELETE: ~/api/products/:id
   @Delete(':id')
   @UseGuards(AuthRolesGuard)
   @Roles(UserType.ADMIN)
