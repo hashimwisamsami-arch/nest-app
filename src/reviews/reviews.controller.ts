@@ -1,9 +1,12 @@
 import {
   Body,
   Controller,
+  Delete,
+  Get,
   Param,
   ParseIntPipe,
   Post,
+  Put,
   UseGuards,
 } from '@nestjs/common';
 import { ReviewService } from './reviews.service.js';
@@ -13,6 +16,7 @@ import type { JWTPayloadType } from '../utils/types.js';
 import { AuthRolesGuard } from '../users/guards/auth-roles.guard.js';
 import { Roles } from '../users/decorators/user-role.decorator.js';
 import { UserType } from '../utils/enum.js';
+import { UpdateReviewDto } from './dtos/update-review.dto.js';
 
 @Controller('api/reviews')
 export class ReviewsControllers {
@@ -28,5 +32,44 @@ export class ReviewsControllers {
     @CurrentUser() payload: JWTPayloadType,
   ) {
     return this.reviewsService.createReview(productId, payload.id, body);
+  }
+
+  //GET:~/api/reviews
+  @Get('')
+  @UseGuards(AuthRolesGuard)
+  @Roles(UserType.ADMIN)
+  public getAllReviews() {
+    return this.reviewsService.getAll();
+  }
+
+  //GET:~/api/reviews/:id
+  @Get(':id')
+  @UseGuards(AuthRolesGuard)
+  @Roles(UserType.ADMIN)
+  public getReviewById(@Param('id', ParseIntPipe) id: number) {
+    return this.reviewsService.getOneBy(id);
+  }
+
+  //PUT:~/api/reviews/:id
+  @Put(':id')
+  @UseGuards(AuthRolesGuard)
+  @Roles(UserType.ADMIN, UserType.NORMAL_USER)
+  public updateReview(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: UpdateReviewDto,
+    @CurrentUser() payload: JWTPayloadType,
+  ) {
+    return this.reviewsService.update(id, payload.id, body);
+  }
+
+  //DELETE:~/api/reviews/:id
+  @Delete(':id')
+  @UseGuards(AuthRolesGuard)
+  @Roles(UserType.ADMIN, UserType.NORMAL_USER)
+  public deleteReview(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() payload: JWTPayloadType,
+  ) {
+    return this.reviewsService.delete(id, payload);
   }
 }

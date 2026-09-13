@@ -35,6 +35,6 @@ export class Review {
   @ManyToOne(() => Product, (product) => product.reviews)
   product: Relation<Product>;
 
-  @ManyToOne(() => User, (user) => user.reviews)
+  @ManyToOne(() => User, (user) => user.reviews, { eager: true })
   user: Relation<User>;
 }
