@@ -8,19 +8,22 @@ import { User } from './users.entity.js';
 import { Repository } from 'typeorm';
 import { LoginDto } from './dtos/login.dto.js';
 import { MailService } from '../mail/mail.service.js';
+import { randomBytes } from 'node:crypto';
+import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class AuthProvider {
   constructor(
     @InjectRepository(User) private readonly usersRepository: Repository<User>,
     private readonly jwtService: JwtService,
     private readonly mailService: MailService,
+    private readonly config: ConfigService,
   ) {}
   /**
    *Create New user
    * @param registerDto data for create new user
    * @returns JWT (access token)
    */
-  public async register(registerDto: RegisterDto): Promise<AccessTokenType> {
+  public async register(registerDto: RegisterDto) {
     const { email, password, username } = registerDto;
 
     const userFromDb = await this.usersRepository.findOne({ where: { email } });
@@ -34,22 +37,20 @@ export class AuthProvider {
       email,
       username,
       password: hashedPassword,
+      verificationToken: randomBytes(32).toString('hex'),
     });
     newUser = await this.usersRepository.save(newUser);
-
-    const accessToken = await this.generateJWT({
-      id: newUser.id,
-      userType: newUser.userType,
-    });
-    return { accessToken };
+    const link = this.generateLink(newUser.id, newUser.verificationToken);
+    await this.mailService.sendVerifyEmailTemplate(email, link);
+    return { message: 'Verification token has been send' };
   }
 
   /**
    *Login user
    * @param loginDto data for login user
-   * @returns JWT (access token)
+   * @returns success message
    */
-  public async login(loginDto: LoginDto): Promise<AccessTokenType> {
+  public async login(loginDto: LoginDto) {
     const { email, password } = loginDto;
     const user = await this.usersRepository.findOne({ where: { email } });
     if (!user) {
@@ -58,6 +59,18 @@ export class AuthProvider {
     const isPasswordMatch = await bcrypt.compare(password, user.password);
     if (!isPasswordMatch) {
       throw new BadRequestException('invalid email or password');
+    }
+
+    if (!user.isAccountVerified) {
+      let verificationToken = user.verificationToken;
+      if (!verificationToken) {
+        user.verificationToken = randomBytes(32).toString('hex');
+        const result = await this.usersRepository.save(user);
+        verificationToken = result.verificationToken;
+      }
+      const link = this.generateLink(user.id, verificationToken);
+      await this.mailService.sendVerifyEmailTemplate(email, link);
+      return { message: 'Verification token has been send' };
     }
 
     const accessToken = await await this.generateJWT({
@@ -84,5 +97,9 @@ export class AuthProvider {
    */
   private generateJWT(payload: JWTPayloadType): Promise<string> {
     return this.jwtService.signAsync(payload);
+  }
+
+  private generateLink(userId: number, verificationToken: string | null) {
+    return `${this.config.get<string>('DOMAIN')}/api/users/verify-email/${userId}/${verificationToken}`;
   }
 }
