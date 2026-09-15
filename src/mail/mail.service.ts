@@ -16,16 +16,8 @@ export class MailService {
         to: email,
         from: `<no-reply@my-nestjs-app.com>`,
         subject: 'Log In',
-        html: `
-            <div>
-            <h2>
-            ${email}
-            </h2>
-            <p>
-            You Logged in toyour account in ${today.toDateString()} at ${today.toLocaleTimeString()}
-            </p>
-            </div>
-            `,
+        template: 'login.ejs',
+        context: { email, today },
       });
     } catch (error) {
       console.log(error);
