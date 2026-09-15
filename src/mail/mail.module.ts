@@ -2,6 +2,13 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MailService } from './mail.service.js';
+import { EjsAdapter } from '@nestjs-modules/mailer/adapters/ejs.adapter';
+
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 @Module({
   imports: [
@@ -17,6 +24,12 @@ import { MailService } from './mail.service.js';
             user: config.get<string>('SMTP_USERNAME'),
             pass: config.get<string>('SMTP_PASSWORD'),
           },
+        },
+        template: {
+          dir: join(__dirname, 'templates'),
+          adapter: new EjsAdapter({
+            inlineCssEnabled: true,
+          }),
         },
       }),
     }),
