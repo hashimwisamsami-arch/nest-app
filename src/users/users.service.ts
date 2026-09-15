@@ -15,6 +15,7 @@ import { UserType } from '../utils/enum.js';
 import { AuthProvider } from './auth.provider.js';
 import { join } from 'path';
 import { unlinkSync } from 'fs';
+import { ResetPasswordDto } from './dtos/reset-password.dto.js';
 
 @Injectable()
 export class UsersService {
@@ -159,5 +160,33 @@ export class UsersService {
     return {
       message: 'Your email has been verified,please log in to your account',
     };
+  }
+
+  /**
+   * Sending reset password template
+   * @param email email of user
+   * @returns success message
+   */
+  public sendResetPassword(email: string) {
+    return this.authProvider.sendResetPasswordLink(email);
+  }
+
+  /**
+   * get Reset Password
+   * @param userId id of user
+   * * @resertPasswordToken resertPasswordToken from the link
+   * @returns success message
+   */
+  public getResetPassword(userId: number, resertPasswordToken: string) {
+    return this.authProvider.getResetPasswordLink(userId, resertPasswordToken);
+  }
+
+  /**
+   * reset Password
+   * @param dto infromation to reset password
+   * @returns success message
+   */
+  public resetPassword(dto: ResetPasswordDto) {
+    return this.authProvider.resetThePassword(dto);
   }
 }

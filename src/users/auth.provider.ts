@@ -10,6 +10,7 @@ import { LoginDto } from './dtos/login.dto.js';
 import { MailService } from '../mail/mail.service.js';
 import { randomBytes } from 'node:crypto';
 import { ConfigService } from '@nestjs/config';
+import { ResetPasswordDto } from './dtos/reset-password.dto.js';
 @Injectable()
 export class AuthProvider {
   constructor(
@@ -79,6 +80,67 @@ export class AuthProvider {
     });
     await this.mailService.sendLogInEmail(user.email);
     return { accessToken };
+  }
+
+  /**
+   *  sending reset password link to the client
+   */
+  public async sendResetPasswordLink(email: string) {
+    const user = await this.usersRepository.findOne({ where: { email } });
+    if (!user) {
+      throw new BadRequestException('user with this email not found');
+    }
+    user.resetPasswordToken = randomBytes(32).toString('hex');
+    const result = await this.usersRepository.save(user);
+
+    const resetPasswordLink = `${this.config.get<string>('CLINT_DOMAIN')}/reset-password/${user.id}/${result.resetPasswordToken}`;
+    await this.mailService.sendResetPasswordTemplate(email, resetPasswordLink);
+    return {
+      message: 'Password Reset link sent to your email,please check your inbox',
+    };
+  }
+
+  /**
+   * Get reset password link
+   */
+  public async getResetPasswordLink(
+    userId: number,
+    resetPasswordToken: string,
+  ) {
+    const user = await this.usersRepository.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new BadRequestException('user with this email not found');
+    }
+    if (
+      user.resetPasswordToken === null ||
+      user.resetPasswordToken !== resetPasswordToken
+    ) {
+      throw new BadRequestException('invalid link');
+    }
+    return { message: 'valid link' };
+  }
+
+  /**
+   * reset the password
+   */
+
+  public async resetThePassword(dto: ResetPasswordDto) {
+    const { userId, resetPasswordToken, newPassword } = dto;
+    const user = await this.usersRepository.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new BadRequestException('user with this email not found');
+    }
+    if (
+      user.resetPasswordToken === null ||
+      user.resetPasswordToken !== resetPasswordToken
+    ) {
+      throw new BadRequestException('invalid link');
+    }
+    const hashedPassword = await this.hashPassword(newPassword);
+    user.password = hashedPassword;
+    user.resetPasswordToken = null;
+    await this.usersRepository.save(user);
+    return { message: 'password resent successfully,please log in' };
   }
 
   /**
