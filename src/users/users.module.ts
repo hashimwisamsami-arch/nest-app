@@ -9,12 +9,14 @@ import type { StringValue } from 'ms';
 import { AuthProvider } from './auth.provider.js';
 import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
+import { MailModule } from '../mail/mail.module.js';
 
 @Module({
   controllers: [UsersController],
   providers: [UsersService, AuthProvider],
   exports: [UsersService],
   imports: [
+    MailModule,
     TypeOrmModule.forFeature([User]),
     JwtModule.registerAsync({
       inject: [ConfigService],
