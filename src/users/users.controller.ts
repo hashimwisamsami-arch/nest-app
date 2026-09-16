@@ -32,6 +32,8 @@ import { diskStorage } from 'multer';
 import type { Express, Response } from 'express';
 import { ForgotPasswordDto } from './dtos/forgot-passwor.dto.js';
 import { ResetPasswordDto } from './dtos/reset-password.dto.js';
+import { ApiBody, ApiConsumes } from '@nestjs/swagger';
+import { ImageUploadDto } from '../products/dtos/image-upload.dto.js';
 
 @Controller('api/users')
 export class UsersController {
@@ -90,6 +92,8 @@ export class UsersController {
   //POST: ~/api/users/upload-image
   @Post('upload-image')
   @UseGuards(AuthGuard)
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({ type: ImageUploadDto })
   @UseInterceptors(FileInterceptor('user-image'))
   public uploadProfileImage(
     @UploadedFile() file: Express.Multer.File,
