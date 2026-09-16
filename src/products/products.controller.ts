@@ -18,6 +18,12 @@ import { Roles } from '../users/decorators/user-role.decorator.js';
 import { UserType } from '../utils/enum.js';
 import { CurrentUser } from '../users/decorators/current-user.decorator.js';
 import type { JWTPayloadType } from '../utils/types.js';
+import {
+  ApiOperation,
+  ApiQuery,
+  ApiResponse,
+  ApiSecurity,
+} from '@nestjs/swagger';
 
 @Controller('api/products')
 export class ProductsController {
@@ -25,6 +31,28 @@ export class ProductsController {
 
   // GET: ~/api/products
   @Get()
+  @ApiResponse({ status: 200, description: 'products fetch successfully' })
+  @ApiOperation({ summary: 'Get a collection of product' })
+  @ApiQuery({
+    name: 'title',
+    required: false,
+    type: 'string',
+    description: 'search based on product title',
+  })
+  @ApiQuery({
+    name: 'minPrice',
+    required: false,
+    type: 'string',
+    description: 'search based on product minPrice',
+    example: 100,
+  })
+  @ApiQuery({
+    name: 'maxPrice',
+    required: false,
+    type: 'string',
+    description: 'search based on product maxPrice',
+    example: 200,
+  })
   public getAllProducts(
     @Query('title') title: string,
     @Query('minPrice') minPrice: string,
@@ -41,6 +69,7 @@ export class ProductsController {
 
   // Post: ~/api/products
   @Post()
+  @ApiSecurity('bearer')
   @UseGuards(AuthRolesGuard)
   @Roles(UserType.ADMIN)
   public craeteNewProduct(
@@ -52,6 +81,7 @@ export class ProductsController {
   }
   // PUt: ~/api/products/:id
   @Put(':id')
+  @ApiSecurity('bearer')
   @UseGuards(AuthRolesGuard)
   @Roles(UserType.ADMIN)
   public updateProduct(
@@ -63,6 +93,7 @@ export class ProductsController {
   }
   // DELETE: ~/api/products/:id
   @Delete(':id')
+  @ApiSecurity('bearer')
   @UseGuards(AuthRolesGuard)
   @Roles(UserType.ADMIN)
   public deleteProduct(@Param('id', ParseIntPipe) id: number) {
